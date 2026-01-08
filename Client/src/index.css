@@ -1,0 +1,16 @@
+@import "tailwindcss";
+
+/* Settingan Variabel Warna & Font (Meniru project Vue lama kamu) */
+@theme {
+  --font-sans: 'Poppins', sans-serif;
+  
+  --color-primary: #ED8B3C;   /* Orange Tombol */
+  --color-secondary: #f7f1e8; /* Cream Background */
+  --color-dark: #2a2a2a;      /* Hitam Text */
+}
+
+/* Terapkan Font Global */
+body {
+  font-family: var(--font-sans);
+  background-color: var(--color-secondary);
+}
