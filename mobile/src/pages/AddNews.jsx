@@ -1,4 +1,5 @@
-import { useState } from "react";
+import React, { useState } from "react";
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from "react-native";
 
 export default function AddNews() {
   const [form, setForm] = useState({
@@ -7,41 +8,67 @@ export default function AddNews() {
     image: "",
   });
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSubmit = async () => {
+    try {
+      await fetch("http://10.0.2.2:5000/api/news", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
 
-    await fetch("http://localhost:5000/api/news", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form),
-    });
-
-    alert("News berhasil ditambahkan");
+      Alert.alert("Sukses", "News berhasil ditambahkan");
+      setForm({ title: "", desc: "", image: "" });
+    } catch (err) {
+      Alert.alert("Error", "Gagal menambahkan news");
+    }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="max-w-md mx-auto p-6">
-      <input
-        className="border p-2 w-full mb-3"
+    <View style={styles.container}>
+      <TextInput
         placeholder="Judul"
-        onChange={(e) => setForm({ ...form, title: e.target.value })}
+        style={styles.input}
+        value={form.title}
+        onChangeText={(text) => setForm({ ...form, title: text })}
       />
 
-      <textarea
-        className="border p-2 w-full mb-3"
+      <TextInput
         placeholder="Deskripsi"
-        onChange={(e) => setForm({ ...form, desc: e.target.value })}
+        style={[styles.input, styles.textArea]}
+        multiline
+        value={form.desc}
+        onChangeText={(text) => setForm({ ...form, desc: text })}
       />
 
-      <input
-        className="border p-2 w-full mb-3"
-        placeholder="Path / URL gambar"
-        onChange={(e) => setForm({ ...form, image: e.target.value })}
+      <TextInput
+        placeholder="URL Gambar"
+        style={styles.input}
+        value={form.image}
+        onChangeText={(text) => setForm({ ...form, image: text })}
       />
 
-      <button className="bg-orange-500 text-white px-4 py-2 rounded">
-        Add News
-      </button>
-    </form>
+      <TouchableOpacity style={styles.button} onPress={handleSubmit}>
+        <Text style={styles.buttonText}>Add News</Text>
+      </TouchableOpacity>
+    </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: { padding: 20 },
+  input: {
+    borderWidth: 1,
+    borderColor: "#ddd",
+    padding: 12,
+    borderRadius: 8,
+    marginBottom: 12,
+  },
+  textArea: { height: 100 },
+  button: {
+    backgroundColor: "#F97316",
+    padding: 14,
+    borderRadius: 8,
+    alignItems: "center",
+  },
+  buttonText: { color: "white", fontWeight: "bold" },
+});
