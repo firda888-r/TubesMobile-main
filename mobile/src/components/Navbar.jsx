@@ -1,41 +1,51 @@
+// mobile/src/components/Navbar.jsx
 import React from 'react';
 import { View, TouchableOpacity, Text, StyleSheet } from 'react-native';
-import { useNavigation, useRoute } from '@react-navigation/native';
-// Use lucide-react-native for icons
-import { Home, Cat, ClipboardList, Siren, User, LogOut } from 'lucide-react-native'; 
+import { Home, Cat, Siren, User } from 'lucide-react-native'; 
 
-const Navbar = () => {
-  const navigation = useNavigation();
-  const route = useRoute(); // To check active tab
-
-  // Helper to determine active color
-  const getColor = (screenName) => route.name === screenName ? '#F59E0B' : '#9CA3AF';
-
+const Navbar = ({ state, descriptors, navigation }) => {
   return (
     <View style={styles.navbarContainer}>
       <View style={styles.navItems}>
-        
-        <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate('Home')}>
-          <Home color={getColor('Home')} size={24} />
-          <Text style={[styles.navText, { color: getColor('Home') }]}>Home</Text>
-        </TouchableOpacity>
+        {state.routes.map((route, index) => {
+          const { options } = descriptors[route.key];
+          const isFocused = state.index === index;
 
-        <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate('Adopt')}>
-          <Cat color={getColor('Adopt')} size={24} />
-          <Text style={[styles.navText, { color: getColor('Adopt') }]}>Adopt</Text>
-        </TouchableOpacity>
+          // Define Icon based on route name
+          let IconComponent;
+          if (route.name === 'Home') IconComponent = Home;
+          else if (route.name === 'Adopt') IconComponent = Cat;
+          else if (route.name === 'Report') IconComponent = Siren;
+          else if (route.name === 'Profile') IconComponent = User;
+          else IconComponent = Home; // Default
 
-        <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate('Report')}>
-          <Siren color={getColor('Report')} size={24} />
-          <Text style={[styles.navText, { color: getColor('Report') }]}>Report</Text>
-        </TouchableOpacity>
+          const onPress = () => {
+            const event = navigation.emit({
+              type: 'tabPress',
+              target: route.key,
+              canPreventDefault: true,
+            });
 
-        {/* Add logic for Auth/Profile similar to your web code */}
-        <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate('Profile')}>
-          <User color={getColor('Profile')} size={24} />
-          <Text style={[styles.navText, { color: getColor('Profile') }]}>Profile</Text>
-        </TouchableOpacity>
+            if (!isFocused && !event.defaultPrevented) {
+              navigation.navigate(route.name);
+            }
+          };
 
+          const color = isFocused ? '#F59E0B' : '#9CA3AF'; // Orange aktif, Gray tidak aktif
+
+          return (
+            <TouchableOpacity
+              key={index}
+              onPress={onPress}
+              style={styles.navItem}
+            >
+              <IconComponent color={color} size={24} />
+              <Text style={[styles.navText, { color }]}>
+                {route.name}
+              </Text>
+            </TouchableOpacity>
+          );
+        })}
       </View>
     </View>
   );
@@ -45,12 +55,10 @@ const styles = StyleSheet.create({
   navbarContainer: {
     backgroundColor: '#fff',
     borderTopWidth: 1,
-    borderTopColor: '#e5e5e5',
-    paddingBottom: 20, // For safe area on newer iPhones
-    paddingTop: 10,
-    position: 'absolute',
-    bottom: 0,
-    width: '100%',
+    borderTopColor: '#E5E7EB',
+    paddingBottom: 20, // Safe area for iOS
+    paddingTop: 12,
+    height: 85, // Tinggi navbar
   },
   navItems: {
     flexDirection: 'row',
@@ -64,6 +72,7 @@ const styles = StyleSheet.create({
   navText: {
     fontSize: 10,
     marginTop: 4,
+    fontWeight: '500',
   },
 });
 

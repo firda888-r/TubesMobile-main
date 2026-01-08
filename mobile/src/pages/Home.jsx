@@ -12,7 +12,7 @@ const Home = () => {
 
   // Example data (replace with your actual data source/props)
   const heroImages = [
-    require('../../public/images/home/hero-image.jpg'), // Ensure paths are correct
+    require('../../assets/images/icon.png'), // Ensure paths are correct
     // ... other images
   ];
 

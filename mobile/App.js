@@ -3,32 +3,35 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { StatusBar } from 'expo-status-bar';
 
-// Import Context dan Halaman yang baru dibuat
+// Pastikan path import ini sesuai dengan file Anda
 import { AuthProvider, useAuth } from './src/context/AuthContext';
 import Login from './src/pages/Login';
 import Home from './src/pages/Home';
-// import SignUp from './src/pages/SignUp'; // Buat file ini nanti jika ingin fitur daftar
+import SignUp from './src/pages/SignUp'; // Tambahkan ini jika ada
 
 const Stack = createStackNavigator();
 
-// Komponen untuk mengatur alur navigasi (User login -> Home, Belum -> Login)
 function AppNavigator() {
   const { currentUser, loading } = useAuth();
 
   if (loading) {
-    return null; // Atau ganti dengan Loading Spinner
+    // Bisa ganti dengan SplashScreen atau ActivityIndicator
+    return null; 
   }
 
   return (
-    <Stack.Navigator>
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
       {currentUser ? (
-        // Jika User SUDAH Login, tampilkan Home
-        <Stack.Screen name="Home" component={Home} options={{ headerShown: false }} />
-      ) : (
-        // Jika User BELUM Login, tampilkan Login
+        // --- STACK UNTUK USER YANG SUDAH LOGIN ---
         <>
-          <Stack.Screen name="Login" component={Login} options={{ headerShown: false }} />
-          {/* <Stack.Screen name="SignUp" component={SignUp} options={{ headerShown: false }} /> */}
+          <Stack.Screen name="Home" component={Home} />
+          {/* Tambahkan screen lain yang butuh login disini, misal Profile */}
+        </>
+      ) : (
+        // --- STACK UNTUK USER BELUM LOGIN (Auth) ---
+        <>
+          <Stack.Screen name="Login" component={Login} />
+          <Stack.Screen name="SignUp" component={SignUp} />
         </>
       )}
     </Stack.Navigator>

@@ -1,6 +1,10 @@
-import React, { createContext, useState, useEffect, useContext } from 'react';
+import React, { createContext, useState, useEffect, useContext } from "react";
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import axios from 'axios';
+import axios from "axios";
+
+// Definisikan BASE_URL untuk API (Gunakan IP Laptop, bukan localhost)
+// Cek file config.js Anda atau hardcode disini sementara
+export const BASE_URL = "http://10.52.197.166:8081"; // <-- SESUAIKAN PORT SERVER ANDA
 
 export const AuthContext = createContext();
 
@@ -12,7 +16,7 @@ export const AuthProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Cek apakah user sudah login saat aplikasi dibuka
+  // Load user saat aplikasi dibuka
   useEffect(() => {
     const loadUser = async () => {
       try {
@@ -21,7 +25,7 @@ export const AuthProvider = ({ children }) => {
           setCurrentUser(JSON.parse(userJson));
         }
       } catch (e) {
-        console.log("Error loading user:", e);
+        console.log("Gagal load user:", e);
       } finally {
         setLoading(false);
       }
@@ -30,15 +34,26 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const login = async (userData) => {
-    // Simpan data user ke penyimpanan HP
-    await AsyncStorage.setItem("user", JSON.stringify(userData));
-    setCurrentUser(userData);
+    try {
+      // Simpan data user & token ke penyimpanan HP
+      await AsyncStorage.setItem("user", JSON.stringify(userData));
+      setCurrentUser(userData);
+    } catch (e) {
+      console.log("Gagal simpan login:", e);
+    }
   };
 
   const logout = async () => {
-    // Hapus data user dari HP
-    await AsyncStorage.removeItem("user");
-    setCurrentUser(null);
+    try {
+      await axios.post(`${BASE_URL}/auth/logout`);
+      await AsyncStorage.removeItem("user");
+      setCurrentUser(null);
+    } catch (err) {
+      console.log("Logout error:", err);
+      // Tetap hapus lokal data meski server error
+      await AsyncStorage.removeItem("user");
+      setCurrentUser(null);
+    }
   };
 
   return (
