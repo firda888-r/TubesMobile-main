@@ -7,9 +7,13 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("http://localhost:5000/api/news")
+    // --- PERUBAHAN IP DI SINI ---
+    // Pastikan port backend Anda benar (5000 atau 8081 sesuai server.js Anda)
+    fetch("http://192.168.64.218:5000/api/news") 
       .then((res) => res.json())
-      .then((data) => setNewsData(data));
+      .then((data) => setNewsData(data))
+      .catch((err) => console.error("Error fetching news:", err))
+      .finally(() => setLoading(false));
   }, []);
 
   return (

@@ -1,0 +1,1 @@
+export const BASE_URL = "http://10.52.197.166:8081"; // Ganti port jika perlu
